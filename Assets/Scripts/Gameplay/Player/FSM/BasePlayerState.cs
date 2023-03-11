@@ -1,3 +1,4 @@
+using System;
 using Common.Input;
 
 namespace Gameplay.Player.FSM
@@ -16,6 +17,7 @@ namespace Gameplay.Player.FSM
 
         public abstract void OnStart();
         public abstract void OnStop();
-        public virtual void OnInputHandler(TouchInputManager.InputData data){} 
+        public virtual void OnInputHandler(TouchInputManager.InputData data){}
+        public virtual void OnUpdate() {}
     }
 }

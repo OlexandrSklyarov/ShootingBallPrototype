@@ -10,7 +10,7 @@ namespace Gameplay.Player.FSM.States
 
 
         public override void OnStart()
-        {
+        {            
             _agent.Input.InputTouchEvent += OnInputHandler;
         }
         

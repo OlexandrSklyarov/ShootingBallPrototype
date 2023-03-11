@@ -1,11 +1,16 @@
 using UnityEngine;
 using Common.Input;
 using Gameplay.Player;
+using Services.Data;
+using Gameplay.Ball;
 
 namespace Gameplay
 {
     public class GameStarter : MonoBehaviour
     {
+        [SerializeField] private GameData _config;
+        [SerializeField] private Transform _mainBallSpawnPoint;
+        
         private TouchInputManager _input;
         private PlayerController _player;
         private bool _isRunning;
@@ -22,7 +27,10 @@ namespace Gameplay
         private void InitPlayer()
         {
             _input = new TouchInputManager();
-            _player = new PlayerController(_input);
+            var factory = new BallFactory(_config.Ball);
+            var mainBall = factory.GetMainBall(_mainBallSpawnPoint.position, _mainBallSpawnPoint.forward);
+
+            _player = new PlayerController(_input, _config.Player, factory, mainBall);
         }
 
 
@@ -36,6 +44,7 @@ namespace Gameplay
             if (!_isRunning) return;
 
             _input?.OnUpdate();
+            _player?.OnUpdate();
         }
 
 

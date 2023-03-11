@@ -1,9 +1,9 @@
 
 namespace Gameplay.Player.FSM.States
 {
-    public class CheckResultState : BasePlayerState
+    public class StopState : BasePlayerState
     {
-        public CheckResultState(IPlayerContextSwitcher context, IPlayer agent) : base(context, agent)
+        public StopState(IPlayerContextSwitcher context, IPlayer agent) : base(context, agent)
         {
         }
 
