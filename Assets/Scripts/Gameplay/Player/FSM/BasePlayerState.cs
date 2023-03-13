@@ -19,5 +19,6 @@ namespace Gameplay.Player.FSM
         public abstract void OnStop();
         public virtual void OnInputHandler(TouchInputManager.InputData data){}
         public virtual void OnUpdate() {}
+        public virtual void OnFixedUpdate() {}
     }
 }

@@ -99,6 +99,14 @@ namespace Gameplay.Player
         }
 
 
+        public void OnFixedUpdate()
+        {
+            if (!_isActive) return;
+            
+            _currentState?.OnFixedUpdate();
+        }
+
+
         void IPlayer.Die() => DieEvent?.Invoke();
 
 

@@ -1,6 +1,7 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
-using System.Threading.Tasks;
+using Common.Routine;
 using Services.Data;
 using UnityEngine;
 
@@ -14,7 +15,6 @@ namespace Gameplay.Obstacles
         public ObstacleManager(ObstacleData config, Vector3 origin)
         {
             _obstacles = new List<ObstacleUnit>();
-
             SpawnObstacles(config, origin);
         }
 
@@ -32,7 +32,7 @@ namespace Gameplay.Obstacles
 
                 if (rnd.magnitude < config.SpawnRadius.Min) continue;
 
-                var start = new Vector3(rnd.x, HEIGHT, rnd.y);
+                var start = origin + new Vector3(rnd.x, HEIGHT, rnd.y);
 
                 if (Physics.Raycast(start, Vector3.down, out var hit, HEIGHT + 1f, config.GroundLayerMask))
                 {
@@ -46,6 +46,7 @@ namespace Gameplay.Obstacles
         private ObstacleUnit CreateUnit(Vector3 point, ObstacleUnit prefab, Transform container)
         {
             var unit = UnityEngine.Object.Instantiate(prefab, point, Quaternion.identity, container);
+            unit.Init();
             unit.InfectedEvent += OnUnitInfected;
 
             return unit;
@@ -54,50 +55,57 @@ namespace Gameplay.Obstacles
 
         private void OnUnitInfected(ObstacleUnit infectedUnit, float infectedRadius, Color infectedColor)
         {
-            var infected = FindNearInfectedUnits(infectedUnit, infectedRadius);
-
-            for(var i = 0; i < infected.Length; i++)
+            RoutineManager.Run(FindInfected(infectedUnit, infectedRadius, infectedColor, (infected) =>
             {
-                var unit = infected[i];
+                RoutineManager.Run(KillInfected(infected));
+            }));
+        }
 
-                if (_obstacles.Contains(unit))
-                {
-                    unit.Kill(infectedColor);
-                    unit.InfectedEvent -= OnUnitInfected;
-                    _obstacles.Remove(unit);
-                }
+
+        private IEnumerator KillInfected(List<ObstacleUnit> infected)
+        {
+            foreach (var unit in infected)
+            {
+                if (!_obstacles.Contains(unit)) continue;
+
+                unit.InfectedEvent -= OnUnitInfected;
+                unit.Kill();
+                _obstacles.Remove(unit);
+
+                yield return null;
             }
         }
 
 
-        private ObstacleUnit[] FindNearInfectedUnits(ObstacleUnit infectedUnit, float infectedRadius)
+        private IEnumerator FindInfected(ObstacleUnit infectedUnit, float infectedRadius, Color infectedColor, Action<List<ObstacleUnit>> onCompleted)
         {
             var sqRadius = infectedRadius * infectedRadius;
-
             var infected = new List<ObstacleUnit>();
             var temp = new Queue<ObstacleUnit>();
-            temp.Enqueue(infectedUnit);            
+            temp.Enqueue(infectedUnit);
 
             while (temp.Count > 0)
             {
-                var cur = temp.Peek();
+                var cur = temp.Peek();                
 
                 foreach (var other in _obstacles)
                 {
                     if (cur == other) continue;
+                    if (temp.Contains(other)) continue;
+                    if (infected.Contains(other)) continue;
+                    if ((cur.transform.position - other.transform.position).sqrMagnitude > sqRadius) continue;
 
-                    var sqDist = (cur.transform.position - other.transform.position).sqrMagnitude;
+                    temp.Enqueue(other); 
+                }
 
-                    if (sqDist <= sqRadius && !infected.Contains(other))
-                    {
-                        temp.Enqueue(other);
-                    }
-                }  
+                var first = temp.Dequeue();
+                first.PrepareToKill(infectedColor);
+                infected.Add(first);
 
-                infected.Add(temp.Dequeue()); 
+                yield return null;
             }
 
-            return infected.ToArray();
+            onCompleted?.Invoke(infected);
         }
     }
 }

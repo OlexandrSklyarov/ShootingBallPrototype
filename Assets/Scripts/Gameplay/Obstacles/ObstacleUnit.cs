@@ -9,11 +9,30 @@ namespace Gameplay.Obstacles
     {
         [SerializeField] private MeshRenderer _viewRenderer;
 
+        private CapsuleCollider _collider;
+        private bool _isInfected;
+
         public event Action<ObstacleUnit, float, Color> InfectedEvent;
 
 
-        public void Kill(Color endColor)
+        public void Init()
         {
+            _collider = GetComponent<CapsuleCollider>();
+        }
+        
+
+        public void Kill()
+        {
+            _collider.enabled = false;
+            gameObject.SetActive(false);
+        }
+
+
+        public void PrepareToKill(Color endColor)
+        {
+            if (_isInfected) return;
+
+            _isInfected = true;
             StartCoroutine(DieWithDelay(1f, endColor));
         }
 
@@ -24,14 +43,14 @@ namespace Gameplay.Obstacles
             {
                 _viewRenderer.material.color = Color.Lerp(_viewRenderer.material.color, end, time);
                 yield return null;
-            }
-
-            gameObject.SetActive(false);
+            }            
         }
 
 
         void IObstacle.Infect(float sourceRadius, Color infectedColor)
         {
+            if (_isInfected) return;
+
             InfectedEvent?.Invoke(this, sourceRadius, infectedColor);
         }
     }

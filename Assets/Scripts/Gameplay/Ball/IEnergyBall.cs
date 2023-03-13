@@ -10,5 +10,6 @@ namespace Gameplay.Ball
         void SetViewSize(float size);
         void Push(float velocity);
         void OnUpdate();
+        void OnFixedUpdate();
     }
 }

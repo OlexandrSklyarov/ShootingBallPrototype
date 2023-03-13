@@ -7,6 +7,8 @@ namespace Gameplay.Ball
         public Vector3 Center => _view.position;
         public float Radius => Diameter * 0.5f;
         private float Diameter => _view.localScale.y;
+        public Vector3 Forward => transform.forward;
+
 
         [SerializeField] private Transform _view;
         [SerializeField] private Transform _roadView;

@@ -73,9 +73,14 @@ namespace Gameplay.Ball
             if (!_isMoved) return;
 
             _tr.position += _tr.forward * _velocity * Time.deltaTime;
-            CheckCollision();
         }
 
+        public void OnFixedUpdate()
+        {
+            if (!_isMoved) return;
+
+            CheckCollision();
+        }
 
         private void Stop()
         {

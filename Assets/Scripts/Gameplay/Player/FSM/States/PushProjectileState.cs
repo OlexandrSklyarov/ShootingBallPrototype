@@ -20,6 +20,12 @@ namespace Gameplay.Player.FSM.States
         }
 
 
+        public override void OnFixedUpdate()
+        {
+            _agent.CurrentProjectile?.OnFixedUpdate();
+        }
+
+
         public override void OnStop()
         {            
             _agent.ResetProjectile();

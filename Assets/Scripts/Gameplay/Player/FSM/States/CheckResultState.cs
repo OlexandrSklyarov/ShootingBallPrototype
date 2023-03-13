@@ -37,15 +37,16 @@ namespace Gameplay.Player.FSM.States
 
         private async void CheckPathFreeAsync(CancellationToken token, Action success, Action failure)
         {
-            var isFree =  !Physics.SphereCast
-            (
-                new Ray(_agent.MainBall.Center, _agent.MainBall.transform.forward),
-                _agent.MainBall.Radius, 
-                _agent.Config.ObstaclesLayerMask
-            );
-
             await Task.Yield();
             if (token.IsCancellationRequested) return;
+
+            var isFree =  !Physics.SphereCast
+            (
+                new Ray(_agent.MainBall.Center, _agent.MainBall.Forward),
+                _agent.MainBall.Radius, 
+                float.MaxValue,
+                _agent.Config.ObstaclesLayerMask
+            );
 
             Util.Debug.PrintColor($"path isFree: {isFree}", (isFree) ? UnityEngine.Color.green : UnityEngine.Color.red);
 

@@ -53,6 +53,14 @@ namespace Gameplay
         }
 
 
+        private void FixedUpdate()
+        {
+            if (!_isRunning) return;
+            
+            _player?.OnFixedUpdate();
+        }
+
+
         private void StartGame()
         {
             _input?.OnEnable();
