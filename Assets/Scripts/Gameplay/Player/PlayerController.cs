@@ -16,6 +16,7 @@ namespace Gameplay.Player
         PlayerData IPlayer.Config => _config;
         BallFactory IPlayer.Factory => _factory;
         BallController IPlayer.MainBall => _mainBal;
+        IEnergyBall IPlayer.CurrentProjectile { get; set; }
 
         private readonly TouchInputManager _input;
         private readonly PlayerData _config;
@@ -43,6 +44,7 @@ namespace Gameplay.Player
             {
                 new WaitState(this, this),
                 new ChargeBallState(this, this),
+                new PushProjectileState(this, this),
                 new CheckResultState(this, this),
                 new MoveToGateState(this, this),
                 new StopState(this, this)

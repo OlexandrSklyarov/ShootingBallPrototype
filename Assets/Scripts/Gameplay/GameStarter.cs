@@ -3,6 +3,8 @@ using Common.Input;
 using Gameplay.Player;
 using Services.Data;
 using Gameplay.Ball;
+using Gameplay.Obstacles;
+using Gameplay.Environment;
 
 namespace Gameplay
 {
@@ -10,9 +12,11 @@ namespace Gameplay
     {
         [SerializeField] private GameData _config;
         [SerializeField] private Transform _mainBallSpawnPoint;
+        [SerializeField] private DoorController _doorController;
         
         private TouchInputManager _input;
         private PlayerController _player;
+        private ObstacleManager _obstacleManager;
         private bool _isRunning;
 
 
@@ -36,6 +40,7 @@ namespace Gameplay
 
         private void InitLevel()
         {
+            _obstacleManager = new ObstacleManager(_config.Obstacle, _doorController.transform.position);
         }
 
 

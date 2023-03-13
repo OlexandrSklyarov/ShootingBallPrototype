@@ -45,7 +45,7 @@ namespace Gameplay.Ball
 
             item.transform.SetPositionAndRotation(spawnPosition, Quaternion.LookRotation(direction));
             item.gameObject.SetActive(true);
-            item.Setup(this);
+            item.Init(this);
 
             return item;
         }
@@ -76,7 +76,6 @@ namespace Gameplay.Ball
 
         public void Reclaim(BallProjectile item)
         {
-            item.Stop();
             item.gameObject.SetActive(false);
             _pool.Push(item);
         }

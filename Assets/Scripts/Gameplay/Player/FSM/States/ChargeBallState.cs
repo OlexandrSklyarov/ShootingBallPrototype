@@ -1,13 +1,9 @@
 using Common.Input;
-using Gameplay.Ball;
 
 namespace Gameplay.Player.FSM.States
 {
     public class ChargeBallState : BasePlayerState
     {
-        private IEnergyBall _projectile;
-
-
         public ChargeBallState(IPlayerContextSwitcher context, IPlayer agent) : base(context, agent)
         {
         }
@@ -40,7 +36,7 @@ namespace Gameplay.Player.FSM.States
 
                 case UnityEngine.InputSystem.TouchPhase.Ended:
 
-                    PushBall();
+                    Push();
                     
                     break;
             }           
@@ -49,35 +45,34 @@ namespace Gameplay.Player.FSM.States
 
         private void SpawnProjectile()
         {
-            _projectile = _agent.Factory.GetProjectile
+            _agent.CurrentProjectile = _agent.Factory.GetProjectile
             (
                 _agent.MainBall.GetSpawnPoint(), 
                 _agent.MainBall.transform.forward
             );
 
-            _projectile.SetViewSize(_agent.Config.BallSize.Min);
+            _agent.CurrentProjectile.SetViewSize(_agent.Config.BallSize.Min);
         }
 
 
-        private void PushBall()
+        private void Push()
         {
-            if (_projectile == null) return;
+            Util.Debug.Print("push");
+            if (_agent.CurrentProjectile == null) return;
             
-            _projectile.Push(_agent.Config.BaseProjectileVelocity);
-            _projectile = null;
-            _context.SwitchState<CheckResultState>();
+            _agent.CurrentProjectile.Push(_agent.Config.BaseProjectileVelocity);
+            _context.SwitchState<PushProjectileState>();
         }
 
 
         private void ChargeBallProcess()
         {
             var minSize = _agent.Config.BallSize.Min;
-            var info = _agent.MainBall
-                .GetEnergy(_agent.Config.EnergyTransferRate * _agent.Config.EnergyTransferSpeed, minSize);
             
-            _projectile.AddSize(info.energy);
-
-            Util.Debug.PrintColor($"info.energy {info.energy}", UnityEngine.Color.cyan);
+            var info = _agent.MainBall.GetEnergy(
+                _agent.Config.EnergyTransferRate * _agent.Config.EnergyTransferSpeed, minSize);
+            
+            _agent.CurrentProjectile.AddSize(info.energy);
 
             if (info.currentSize <= minSize) Die();
         }
@@ -85,7 +80,7 @@ namespace Gameplay.Player.FSM.States
 
         private void Die()
         {
-            _projectile = null;
+            _agent.CurrentProjectile = null;
             _agent.Die();
             _context.SwitchState<StopState>();
         }

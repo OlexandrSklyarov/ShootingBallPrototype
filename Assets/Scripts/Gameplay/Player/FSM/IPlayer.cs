@@ -10,6 +10,7 @@ namespace Gameplay.Player.FSM
         PlayerData Config {get;}
         BallFactory Factory {get;}
         BallController MainBall {get;}
+        IEnergyBall CurrentProjectile {get; set;}
 
         void Die();
     }
