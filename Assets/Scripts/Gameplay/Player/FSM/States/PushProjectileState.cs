@@ -10,7 +10,7 @@ namespace Gameplay.Player.FSM.States
 
         public override void OnStart()
         {                    
-            _agent.ProjectileDestroyEvent += SwitchToCheckResult;   
+            _agent.ProjectileDestroyEvent += SwitchWait;   
         }
 
 
@@ -32,10 +32,10 @@ namespace Gameplay.Player.FSM.States
         }
 
 
-        private void SwitchToCheckResult() 
+        private void SwitchWait() 
         {            
-            _agent.ProjectileDestroyEvent -= SwitchToCheckResult;   
-            _context.SwitchState<CheckResultState>();
+            _agent.ProjectileDestroyEvent -= SwitchWait;   
+            _context.SwitchState<WaitState>();
         }
     }
 }

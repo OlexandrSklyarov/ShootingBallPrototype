@@ -22,7 +22,7 @@ namespace Services.Data
         [field: SerializeField, Min(0.01f)] public float EnergyTransferSpeed {get; private set;} = 2f;
         [field: SerializeField, Min(1f)] public float BaseProjectileVelocity {get; private set;} = 2f;
         [field: SerializeField] public RangeFloatValue BallSize {get; private set;}
-        [field: SerializeField] public LayerMask ObstaclesLayerMask {get; private set;}
+        [field: SerializeField] public LayerMask ObstacleLayerMask {get; private set;}
     }
 
 

@@ -5,6 +5,7 @@ using Services.Data;
 using Gameplay.Ball;
 using Gameplay.Obstacles;
 using Gameplay.Environment;
+using System;
 
 namespace Gameplay
 {
@@ -22,10 +23,19 @@ namespace Gameplay
 
         private void Awake() 
         {
-            InitLevel();
-            InitPlayer();
-            StartGame();            
+            InitLevel(() =>
+            {
+                InitPlayer();
+                StartGame();  
+            });
         }        
+
+
+        private void InitLevel(Action onCompleted)
+        {
+            _obstacleManager = new ObstacleManager(_config.Obstacle);
+            _obstacleManager.SpawnObstacles(_doorController.transform.position, onCompleted);
+        }
 
 
         private void InitPlayer()
@@ -35,12 +45,6 @@ namespace Gameplay
             var mainBall = factory.GetMainBall(_mainBallSpawnPoint.position, _mainBallSpawnPoint.forward);
 
             _player = new PlayerController(_input, _config.Player, factory, mainBall, _doorController);
-        }
-
-
-        private void InitLevel()
-        {
-            _obstacleManager = new ObstacleManager(_config.Obstacle, _doorController.transform.position);
         }
 
 
@@ -75,7 +79,18 @@ namespace Gameplay
             _input?.OnDisable();
             _player?.Disable();
 
+            _input = null;
+            _player = null;
+
             _isRunning = false;
+        }
+
+
+        private void OnDestroy() 
+        {
+            #if UNITY_EDITOR
+            StopGame();    
+            #endif
         }
     }
 }

@@ -9,37 +9,43 @@ namespace Gameplay.Obstacles
 {
     public class ObstacleManager
     {
+        private readonly ObstacleData _config;
         private readonly List<ObstacleUnit> _obstacles;
 
 
-        public ObstacleManager(ObstacleData config, Vector3 origin)
+        public ObstacleManager(ObstacleData config)
         {
+            _config = config;
             _obstacles = new List<ObstacleUnit>();
-            SpawnObstacles(config, origin);
         }
 
 
-        private void SpawnObstacles(ObstacleData config, Vector3 origin)
+        public void SpawnObstacles(Vector3 origin, Action onCompleted) => SpawnObstaclesInternal(origin, onCompleted);
+
+
+        private void SpawnObstaclesInternal(Vector3 origin, Action onCompleted)
         {
             const float HEIGHT = 100f;
 
-            var count = UnityEngine.Random.Range(config.SpawnCount.Min, config.SpawnCount.Max);
+            var count = UnityEngine.Random.Range(_config.SpawnCount.Min, _config.SpawnCount.Max);
             var container = new GameObject("[OBSTACLES]").transform;
 
             while (count > 0)
             {
-                var rnd = UnityEngine.Random.insideUnitCircle * config.SpawnRadius.Max;
+                var rnd = UnityEngine.Random.insideUnitCircle * _config.SpawnRadius.Max;
 
-                if (rnd.magnitude < config.SpawnRadius.Min) continue;
+                if (rnd.magnitude < _config.SpawnRadius.Min) continue;
 
                 var start = origin + new Vector3(rnd.x, HEIGHT, rnd.y);
 
-                if (Physics.Raycast(start, Vector3.down, out var hit, HEIGHT + 1f, config.GroundLayerMask))
+                if (Physics.Raycast(start, Vector3.down, out var hit, HEIGHT + 1f, _config.GroundLayerMask))
                 {
-                    _obstacles.Add(CreateUnit(hit.point, config.ObstaclePrefab, container));
+                    _obstacles.Add(CreateUnit(hit.point, _config.ObstaclePrefab, container));
                     count--;
                 }
             }
+
+            onCompleted?.Invoke();
         }
 
 
@@ -77,12 +83,12 @@ namespace Gameplay.Obstacles
         }
 
 
-        private IEnumerator FindInfected(ObstacleUnit infectedUnit, float infectedRadius, Color infectedColor, Action<List<ObstacleUnit>> onCompleted)
+        private IEnumerator FindInfected(ObstacleUnit firstInfestedUnit, float infectedRadius, Color infectedColor, Action<List<ObstacleUnit>> onCompleted)
         {
             var sqRadius = infectedRadius * infectedRadius;
             var infected = new List<ObstacleUnit>();
             var temp = new Queue<ObstacleUnit>();
-            temp.Enqueue(infectedUnit);
+            temp.Enqueue(firstInfestedUnit);
 
             while (temp.Count > 0)
             {

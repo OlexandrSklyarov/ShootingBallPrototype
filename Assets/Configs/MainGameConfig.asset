@@ -19,9 +19,12 @@ MonoBehaviour:
     <BallSize>k__BackingField:
       _min: 0.2
       _max: 5
-    <ObstaclesLayerMask>k__BackingField:
+    <ObstacleLayerMask>k__BackingField:
       serializedVersion: 2
       m_Bits: 256
+    <DoorLayerMask>k__BackingField:
+      serializedVersion: 2
+      m_Bits: 64
   <Ball>k__BackingField:
     <BallPrefab>k__BackingField: {fileID: 4492595691414377864, guid: 52e9455407f2c0901a3652c4b1ab3002, type: 3}
     <ProjectilePrefab>k__BackingField: {fileID: -7971065567898349273, guid: a761c82ee66aa70758b6ec1ae2e0fa6a, type: 3}

@@ -49,7 +49,6 @@ namespace Gameplay.Player
                 new WaitState(this, this),
                 new ChargeBallState(this, this),
                 new PushProjectileState(this, this),
-                new CheckResultState(this, this),
                 new MoveToGateState(this, this),
                 new StopState(this, this)
             };
@@ -74,7 +73,7 @@ namespace Gameplay.Player
             _currentState?.OnStop(); 
             _isActive = false;
         }
-    
+
 
         public void SwitchState<T>() where T : BasePlayerState
         {
