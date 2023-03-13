@@ -9,10 +9,14 @@ namespace Gameplay.Ball
         private float Diameter => _view.localScale.y;
 
         [SerializeField] private Transform _view;
+        [SerializeField] private Transform _roadView;
+
+        private float _roadDistance;
 
 
-        public void Init(float size)
+        public void Init(float size, Vector3 targetPosition)
         {
+            _roadDistance = (targetPosition - transform.position).magnitude;
             SetViewSize(size);
         }
 
@@ -24,6 +28,13 @@ namespace Gameplay.Ball
             var pos = _view.localPosition;
             pos.y = Radius;
             _view.localPosition = pos;
+
+            SetRoadWidth();
+        }
+
+        private void SetRoadWidth()
+        {
+            _roadView.localScale = new Vector3(Diameter, 1f, _roadDistance);
         }
 
 

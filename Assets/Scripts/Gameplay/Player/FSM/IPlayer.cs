@@ -1,5 +1,7 @@
+using System;
 using Common.Input;
 using Gameplay.Ball;
+using Gameplay.Environment;
 using Services.Data;
 
 namespace Gameplay.Player.FSM
@@ -8,10 +10,14 @@ namespace Gameplay.Player.FSM
     {       
         TouchInputManager Input {get;}
         PlayerData Config {get;}
-        BallFactory Factory {get;}
         BallController MainBall {get;}
-        IEnergyBall CurrentProjectile {get; set;}
+        IEnergyBall CurrentProjectile {get;}
+        DoorController TargetDoor {get;}
 
+        event Action ProjectileDestroyEvent;
+
+        void CreateProjectile();
+        void ResetProjectile();
         void Die();
     }
 }

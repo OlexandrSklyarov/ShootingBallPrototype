@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Common.Input;
 using Gameplay.Ball;
+using Gameplay.Environment;
 using Gameplay.Player.FSM;
 using Gameplay.Player.FSM.States;
 using Services.Data;
@@ -14,31 +15,34 @@ namespace Gameplay.Player
     {
         TouchInputManager IPlayer.Input => _input;
         PlayerData IPlayer.Config => _config;
-        BallFactory IPlayer.Factory => _factory;
         BallController IPlayer.MainBall => _mainBal;
-        IEnergyBall IPlayer.CurrentProjectile { get; set; }
+        IEnergyBall IPlayer.CurrentProjectile => _currentProjectile;
+        DoorController IPlayer.TargetDoor => _targetDoor;
 
         private readonly TouchInputManager _input;
         private readonly PlayerData _config;
         private readonly BallFactory _factory;
         private readonly BallController _mainBal;
-
+        private readonly DoorController _targetDoor;
         private List<BasePlayerState> _allStates;
         private BasePlayerState _currentState;
+        private IEnergyBall _currentProjectile;
         private bool _isActive;
 
         public event Action DieEvent;
+        public event Action ProjectileDestroyEvent;
 
 
         public PlayerController(TouchInputManager input, PlayerData config, 
-            BallFactory factory, BallController mainBall)
+            BallFactory factory, BallController mainBall, DoorController target)
         {
             _input = input;
             _config = config;
             _factory = factory;
             _mainBal = mainBall;
+            _targetDoor = target;
 
-            _mainBal.Init(_config.BallSize.Max);
+            _mainBal.Init(_config.BallSize.Max, _targetDoor.transform.position);
 
             _allStates =  new List<BasePlayerState>()
             {
@@ -77,10 +81,13 @@ namespace Gameplay.Player
             var state = _allStates.FirstOrDefault(s => s is T);
 
             _currentState?.OnStop();
+
+            Util.Debug.PrintColor($"stop state {_currentState.GetType()} - {Time.time}", Color.magenta);
+
             _currentState = state;
             _currentState?.OnStart();
 
-            Util.Debug.PrintColor($"player state {_currentState.GetType()}", Color.cyan);
+            Util.Debug.PrintColor($"player state {_currentState.GetType()} - {Time.time}", Color.cyan);
         }
 
 
@@ -93,5 +100,35 @@ namespace Gameplay.Player
 
 
         void IPlayer.Die() => DieEvent?.Invoke();
+
+
+        void IPlayer.CreateProjectile()
+        {
+            _currentProjectile = _factory.GetProjectile
+            (
+                _mainBal.GetSpawnPoint(), 
+                _mainBal.transform.forward
+            );
+
+            _currentProjectile.HitEvent += OnProjectileHit;
+        }
+
+
+        void IPlayer.ResetProjectile()
+        {
+            if (_currentProjectile == null) return;
+
+            _currentProjectile.HitEvent -= OnProjectileHit;
+            _currentProjectile = null;
+        }
+
+
+        private void OnProjectileHit()
+        {
+            _currentProjectile.HitEvent -= OnProjectileHit;
+            _currentProjectile = null;
+
+            ProjectileDestroyEvent?.Invoke();
+        }
     }
 }

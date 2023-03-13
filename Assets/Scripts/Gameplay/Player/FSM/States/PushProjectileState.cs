@@ -1,7 +1,4 @@
 
-using System;
-using Gameplay.Ball;
-
 namespace Gameplay.Player.FSM.States
 {
     public class PushProjectileState : BasePlayerState
@@ -12,29 +9,26 @@ namespace Gameplay.Player.FSM.States
 
 
         public override void OnStart()
-        {
-            if (_agent.CurrentProjectile == null)
-            {
-                SwitchToWait();
-            }
-            else
-            {
-                _agent.CurrentProjectile.HitEvent += SwitchToCheckResult;
-            }
+        {                    
+            _agent.ProjectileDestroyEvent += SwitchToCheckResult;   
         }
+
+
+        public override void OnUpdate()
+        {
+            _agent.CurrentProjectile?.OnUpdate();
+        }
+
 
         public override void OnStop()
-        {
+        {            
+            _agent.ResetProjectile();
         }
 
 
-        private void SwitchToWait() => _context.SwitchState<WaitState>();
-
-
-        private void SwitchToCheckResult(IEnergyBall projectile) 
-        {
-            projectile.HitEvent -= SwitchToCheckResult;
-            _agent.CurrentProjectile = null;
+        private void SwitchToCheckResult() 
+        {            
+            _agent.ProjectileDestroyEvent -= SwitchToCheckResult;   
             _context.SwitchState<CheckResultState>();
         }
     }

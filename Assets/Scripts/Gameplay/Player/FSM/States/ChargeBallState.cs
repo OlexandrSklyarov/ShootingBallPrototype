@@ -45,19 +45,13 @@ namespace Gameplay.Player.FSM.States
 
         private void SpawnProjectile()
         {
-            _agent.CurrentProjectile = _agent.Factory.GetProjectile
-            (
-                _agent.MainBall.GetSpawnPoint(), 
-                _agent.MainBall.transform.forward
-            );
-
+            _agent.CreateProjectile();
             _agent.CurrentProjectile.SetViewSize(_agent.Config.BallSize.Min);
         }
 
 
         private void Push()
         {
-            Util.Debug.Print("push");
             if (_agent.CurrentProjectile == null) return;
             
             _agent.CurrentProjectile.Push(_agent.Config.BaseProjectileVelocity);
@@ -67,11 +61,9 @@ namespace Gameplay.Player.FSM.States
 
         private void ChargeBallProcess()
         {
-            var minSize = _agent.Config.BallSize.Min;
-            
-            var info = _agent.MainBall.GetEnergy(
-                _agent.Config.EnergyTransferRate * _agent.Config.EnergyTransferSpeed, minSize);
-            
+            var minSize = _agent.Config.BallSize.Min;            
+            var rate = _agent.Config.EnergyTransferRate * _agent.Config.EnergyTransferSpeed;
+            var info = _agent.MainBall.GetEnergy(rate, minSize);            
             _agent.CurrentProjectile.AddSize(info.energy);
 
             if (info.currentSize <= minSize) Die();
@@ -80,7 +72,7 @@ namespace Gameplay.Player.FSM.States
 
         private void Die()
         {
-            _agent.CurrentProjectile = null;
+            _agent.ResetProjectile();
             _agent.Die();
             _context.SwitchState<StopState>();
         }

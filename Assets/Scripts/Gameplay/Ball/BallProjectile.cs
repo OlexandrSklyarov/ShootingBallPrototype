@@ -21,7 +21,7 @@ namespace Gameplay.Ball
         private bool _isMoved;
         private bool _isInit;
 
-        public event Action<IEnergyBall> HitEvent;
+        public event Action HitEvent;
 
         public void Init(IFactoryStorage<BallProjectile> storage)
         {
@@ -68,7 +68,7 @@ namespace Gameplay.Ball
         }
 
 
-        private void Update()
+        public void OnUpdate()
         {
             if (!_isMoved) return;
 
@@ -99,11 +99,13 @@ namespace Gameplay.Ball
             );
 
             if (count <= 0) return;
-            if ( !_results[0].TryGetComponent(out IObstacle obstacle)) return;
+            if ( !_results[0].TryGetComponent(out IObstacle obstacle)) return;            
+
+            HitEvent?.Invoke();
+
+            obstacle.Infect(Radius, _myColor);
 
             Stop();
-            obstacle.Infect(Radius, _myColor);
-            HitEvent?.Invoke(this);
             Hide();
         }
     }

@@ -34,7 +34,7 @@ namespace Gameplay
             var factory = new BallFactory(_config.Ball);
             var mainBall = factory.GetMainBall(_mainBallSpawnPoint.position, _mainBallSpawnPoint.forward);
 
-            _player = new PlayerController(_input, _config.Player, factory, mainBall);
+            _player = new PlayerController(_input, _config.Player, factory, mainBall, _doorController);
         }
 
 
