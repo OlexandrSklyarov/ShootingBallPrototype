@@ -29,7 +29,8 @@ namespace Gameplay.Player
         private IEnergyBall _currentProjectile;
         private bool _isActive;
 
-        public event Action DieEvent;
+        public event Action LossEvent;
+        public event Action WinEvent;
         public event Action ProjectileDestroyEvent;
 
 
@@ -50,7 +51,7 @@ namespace Gameplay.Player
                 new ChargeBallState(this, this),
                 new PushProjectileState(this, this),
                 new MoveToGateState(this, this),
-                new StopState(this, this),
+                new LossState(this, this),
                 new CompletedState(this, this)
             };
 
@@ -81,13 +82,8 @@ namespace Gameplay.Player
             var state = _allStates.FirstOrDefault(s => s is T);
 
             _currentState?.OnStop();
-
-            Util.Debug.PrintColor($"stop state {_currentState.GetType()} - {Time.time}", Color.magenta);
-
             _currentState = state;
             _currentState?.OnStart();
-
-            Util.Debug.PrintColor($"player state {_currentState.GetType()} - {Time.time}", Color.cyan);
         }
 
 
@@ -105,9 +101,6 @@ namespace Gameplay.Player
             
             _currentState?.OnFixedUpdate();
         }
-
-
-        void IPlayer.Die() => DieEvent?.Invoke();
 
 
         void IPlayer.CreateProjectile()
@@ -138,5 +131,11 @@ namespace Gameplay.Player
 
             ProjectileDestroyEvent?.Invoke();
         }
+
+
+        void IPlayer.Loss() => LossEvent?.Invoke();
+
+
+        void IPlayer.Win() => WinEvent?.Invoke();
     }
 }

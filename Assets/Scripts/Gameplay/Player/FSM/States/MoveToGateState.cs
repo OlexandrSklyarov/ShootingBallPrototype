@@ -1,11 +1,10 @@
 
-using System;
-
 namespace Gameplay.Player.FSM.States
 {
     public class MoveToGateState : BasePlayerState
     {
-        private float progressThreshold;
+        private float _progressThreshold;
+
 
         public MoveToGateState(IPlayerContextSwitcher context, IPlayer agent) : base(context, agent)
         {
@@ -13,15 +12,18 @@ namespace Gameplay.Player.FSM.States
 
 
         public override void OnStart()
-        {
-            Util.Debug.PrintColor("Movement process...", UnityEngine.Color.yellow);
+        {            
+            _progressThreshold = CalculateProgress(_agent.Config.MinDistToTarget);               
 
-            progressThreshold = CalculateProgress(_agent.Config.MinDistToTarget);
-
-            LeanTween.move(_agent.MainBall.gameObject, _agent.TargetDoor.transform.position, _agent.Config.MoveToTargetDuration)
-                .setOnUpdate( CheckDistanceToTarget )
-                .setOnComplete( SwitchToCompletedState );
+            _agent.MainBall.JumpTo
+            (
+                _agent.TargetDoor.transform.position, 
+                _agent.Config.MoveToTargetDuration, 
+                CheckDistanceToTarget,
+                SwitchToCompletedState
+            );   
         }
+        
 
         public override void OnStop()
         {
@@ -37,7 +39,7 @@ namespace Gameplay.Player.FSM.States
 
         private void CheckDistanceToTarget(float progress)
         {
-            if (progress < progressThreshold) return;
+            if (progress < _progressThreshold) return;
 
             _agent.TargetDoor.Open();
         }

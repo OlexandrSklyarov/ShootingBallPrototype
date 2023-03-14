@@ -18,6 +18,7 @@ namespace Gameplay.Player.FSM
 
         void CreateProjectile();
         void ResetProjectile();
-        void Die();
+        void Loss();
+        void Win();
     }
 }

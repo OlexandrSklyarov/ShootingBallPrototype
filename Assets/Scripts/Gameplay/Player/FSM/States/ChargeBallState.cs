@@ -72,9 +72,8 @@ namespace Gameplay.Player.FSM.States
 
         private void Die()
         {
-            _agent.ResetProjectile();
-            _agent.Die();
-            _context.SwitchState<StopState>();
+            _agent.ResetProjectile();            
+            _context.SwitchState<LossState>();
         }
     }
 }

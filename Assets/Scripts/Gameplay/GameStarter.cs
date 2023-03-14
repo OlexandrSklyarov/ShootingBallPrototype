@@ -6,6 +6,8 @@ using Gameplay.Ball;
 using Gameplay.Obstacles;
 using Gameplay.Environment;
 using System;
+using System.Collections;
+using UnityEngine.SceneManagement;
 
 namespace Gameplay
 {
@@ -45,6 +47,9 @@ namespace Gameplay
             var mainBall = factory.GetMainBall(_mainBallSpawnPoint.position, _mainBallSpawnPoint.forward);
 
             _player = new PlayerController(_input, _config.Player, factory, mainBall, _doorController);
+
+            _player.LossEvent += OnLoss;
+            _player.WinEvent += OnWin;
         }
 
 
@@ -83,6 +88,34 @@ namespace Gameplay
             _player = null;
 
             _isRunning = false;
+        }
+
+
+        private void OnLoss()
+        {
+            StopGame();
+            Util.Debug.PrintColor("Loss!!!", Color.magenta);
+            Restart();
+        }
+
+
+        private void OnWin()
+        {
+            StopGame();
+            Util.Debug.PrintColor("WIN!!!", Color.green);
+            Restart();
+        }
+
+
+        private void Restart()
+        {
+            StartCoroutine(InternalExecute());
+
+            static IEnumerator InternalExecute()
+            {
+                yield return new WaitForSeconds(2f);
+                SceneManager.LoadSceneAsync(SceneManager.GetActiveScene().buildIndex);
+            }
         }
 
 

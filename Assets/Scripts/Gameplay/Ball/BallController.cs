@@ -1,4 +1,5 @@
 using System;
+using DG.Tweening;
 using UnityEngine;
 
 namespace Gameplay.Ball
@@ -47,7 +48,6 @@ namespace Gameplay.Ball
             var energy = size - (size - energyTransferRate * Time.deltaTime);
             var newSize = Mathf.Max(size - energy, minSize);
 
-
             SetViewSize(newSize);
 
             return (energy, newSize);
@@ -58,5 +58,26 @@ namespace Gameplay.Ball
         {
             return transform.position + transform.forward * _view.localScale.y;
         }        
+
+
+        private void HideRoadView() => _roadView.gameObject.SetActive(false);
+
+
+        public void JumpTo(Vector3 targetPosition, float duration, Action<float> onProgress, Action onCompleted)
+        {
+            HideRoadView();
+
+            LeanTween
+                .move(this.gameObject, targetPosition, duration)
+                .setOnUpdate( onProgress )
+                .setOnComplete( onCompleted );           
+            
+            var startLocalPosition = _view.localPosition;
+
+            _view.DOLocalJump(Vector3.up, 4f, 5, duration).OnComplete(() => 
+            {
+                _view.DOLocalMove(startLocalPosition, 1f);
+            });
+        }
     }
 }
