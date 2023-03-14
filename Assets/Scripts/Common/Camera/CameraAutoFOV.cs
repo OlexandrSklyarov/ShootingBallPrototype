@@ -17,9 +17,9 @@ namespace Common.Camera
         {
             var vc = GetComponent<CinemachineVirtualCamera>();
             var mainCamera = UnityEngine.Camera.main;
-            var isOrthographicMOde = mainCamera.orthographic;
+            var isOrthographicMode = mainCamera.orthographic;
 
-            if (isOrthographicMOde)
+            if (isOrthographicMode)
                 vc.m_Lens.OrthographicSize = Util.CameraExtension.CalculateOrthographicSize(_targetFOV, _targetOrthoSize);
             else
                 vc.m_Lens.FieldOfView = Util.CameraExtension.CalculateTargetFOV(_targetFOV, mainCamera.aspect);

@@ -18,6 +18,8 @@ namespace Services.Data
     [Serializable]
     public class PlayerData
     {
+        [field: SerializeField, Min(0.01f)] public float MinDistToTarget {get; private set;} = 5f;
+        [field: SerializeField, Min(0.01f)] public float MoveToTargetDuration {get; private set;} = 5f;
         [field: SerializeField, Min(0.01f)] public float EnergyTransferRate {get; private set;} = 0.1f;
         [field: SerializeField, Min(0.01f)] public float EnergyTransferSpeed {get; private set;} = 2f;
         [field: SerializeField, Min(1f)] public float BaseProjectileVelocity {get; private set;} = 2f;

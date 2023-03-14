@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 namespace Gameplay.Ball
@@ -56,6 +57,6 @@ namespace Gameplay.Ball
         public Vector3 GetSpawnPoint()
         {
             return transform.position + transform.forward * _view.localScale.y;
-        }
+        }        
     }
 }

@@ -50,7 +50,8 @@ namespace Gameplay.Player
                 new ChargeBallState(this, this),
                 new PushProjectileState(this, this),
                 new MoveToGateState(this, this),
-                new StopState(this, this)
+                new StopState(this, this),
+                new CompletedState(this, this)
             };
 
             _currentState = _allStates[0];
