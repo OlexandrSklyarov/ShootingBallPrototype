@@ -108,7 +108,7 @@ namespace Gameplay.Ball
 
             HitEvent?.Invoke();
 
-            obstacle.Infect(Radius, _myColor);
+            obstacle.TryInfect(Radius, _myColor);
 
             Stop();
             Hide();

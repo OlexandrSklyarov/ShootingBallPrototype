@@ -61,21 +61,21 @@ namespace Gameplay.Obstacles
 
         private void OnUnitInfected(ObstacleUnit infectedUnit, float infectedRadius, Color infectedColor)
         {
-            RoutineManager.Run(FindInfected(infectedUnit, infectedRadius, infectedColor, (infected) =>
+            RoutineManager.Run(FindInfected(infectedUnit, infectedRadius, (allInfected) =>
             {
-                RoutineManager.Run(KillInfected(infected));
+                RoutineManager.Run(KillInfected(allInfected, infectedColor));
             }));
         }
 
 
-        private IEnumerator KillInfected(List<ObstacleUnit> infected)
+        private IEnumerator KillInfected(List<ObstacleUnit> infected, Color infectedColor)
         {
             foreach (var unit in infected)
             {
                 if (!_obstacles.Contains(unit)) continue;
 
                 unit.InfectedEvent -= OnUnitInfected;
-                unit.Kill();
+                unit.Kill(infectedColor);
                 _obstacles.Remove(unit);
 
                 yield return null;
@@ -83,7 +83,7 @@ namespace Gameplay.Obstacles
         }
 
 
-        private IEnumerator FindInfected(ObstacleUnit firstInfestedUnit, float infectedRadius, Color infectedColor, Action<List<ObstacleUnit>> onCompleted)
+        private IEnumerator FindInfected(ObstacleUnit firstInfestedUnit, float infectedRadius, Action<List<ObstacleUnit>> onCompleted)
         {
             var sqRadius = infectedRadius * infectedRadius;
             var infected = new List<ObstacleUnit>();
@@ -97,17 +97,17 @@ namespace Gameplay.Obstacles
                 foreach (var other in _obstacles)
                 {
                     if (cur == other) continue;
+                    if (other.IsInfected) continue;
                     if (temp.Contains(other)) continue;
                     if (infected.Contains(other)) continue;
                     if ((cur.transform.position - other.transform.position).sqrMagnitude > sqRadius) continue;
 
                     temp.Enqueue(other); 
                 }
-
+                
                 var first = temp.Dequeue();
-                first.PrepareToKill(infectedColor);
+                first.Infected();
                 infected.Add(first);
-
                 yield return null;
             }
 
