@@ -7,6 +7,7 @@ namespace Common.Camera
     public class CameraAutoFOV : MonoBehaviour
     {
         [SerializeField, Min(1f)] private float _targetFOV = 32f;
+        [SerializeField, Min(1f)] private float _targetOrthoSize = 32f;
 
 
         private void Awake() => OnValidate();
@@ -15,9 +16,13 @@ namespace Common.Camera
         private void OnValidate() 
         {
             var vc = GetComponent<CinemachineVirtualCamera>();
+            var mainCamera = UnityEngine.Camera.main;
+            var isOrthographicMOde = mainCamera.orthographic;
 
-            vc.m_Lens.FieldOfView = Util.CameraExtension
-                .CalculateTargetFOV(_targetFOV, UnityEngine.Camera.main.aspect);
+            if (isOrthographicMOde)
+                vc.m_Lens.OrthographicSize = Util.CameraExtension.CalculateOrthographicSize(_targetFOV, _targetOrthoSize);
+            else
+                vc.m_Lens.FieldOfView = Util.CameraExtension.CalculateTargetFOV(_targetFOV, mainCamera.aspect);
         }
     }
 }
